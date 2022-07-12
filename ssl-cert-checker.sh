@@ -8,6 +8,9 @@
 # Dependencies  :openssl, mutt (if you use the mail option)
 # License       :GPLv3
 #
+# Modified by   :Jose Zorrilla
+# Website       :www.x-red.com
+# Email         :info@x-red.com
 
 #
 # VARIABLES
@@ -23,8 +26,8 @@ current_date=$(date +%s)
 end_date="${end_date:-}"
 days_left="${days_left:-}"
 certificate_last_day="${certificate_last_day:-}"
-warning_days="${warning_days:-300}"
-alert_days="${alert_days:-150}"
+warning_days="${warning_days:-14}"
+alert_days="${alert_days:-7}"
 # Terminal colors
 ok_color="\e[38;5;40m"
 warning_color="\e[38;5;220m"
@@ -49,7 +52,7 @@ html_mode(){
 			</head>
 			<body style="background-color: lightblue;">
 					<h1 style="color: navy;text-align: center;font-family: 'Helvetica Neue', sans-serif;font-size: 20px;font-weight: bold;">SSL Certs expiration checker</h1>
-					<a href="https://github.com/juliojsb/jota-cert-checker" style="position: absolute; top: 0; right: 0px"><img loading="lazy" width="100" height="100" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=100%2C100" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+					<a href="https://github.com/X-Red/ssl-cert-checker" style="position: absolute; top: 0; right: 0px"><img loading="lazy" width="100" height="100" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=100%2C100" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
 					<table style="background-color: #C5E1E7;padding: 10px;box-shadow: 5px 10px 18px #888888;margin-left: auto ;margin-right: auto ;border: 1px solid black;">
 					<tr style="padding: 8px;text-align: left;font-family: 'Helvetica Neue', sans-serif;">
 					<th style="padding: 8px;text-align: left;font-family: 'Helvetica Neue', sans-serif;font-weight: bold;">Site</th>
@@ -119,7 +122,7 @@ html_mode(){
 }
 
 terminal_mode(){
-	printf "\n| %-25s | %-25s | %-10s | %-8s %s\n" "SITE" "EXPIRATION DAY" "DAYS LEFT" "STATUS"
+	printf "\n| %-27s | %-25s | %-10s | %-8s %s\n" "SITE" "EXPIRATION DAY" "DAYS LEFT" "STATUS"
 
 	while read site;do
 		sitename=$(echo $site | cut -d ":" -f1)
@@ -129,28 +132,28 @@ terminal_mode(){
 			certificate_last_day=$(echo | openssl s_client -servername ${sitename} -connect ${site} 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d "=" -f2)
 			end_date=$(date +%s -d "$certificate_last_day")
 			days_left=$(((end_date - current_date) / 86400))
-		
+
 			if [ "$days_left" -gt "$warning_days" ];then
-				printf "${ok_color}| %-25s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
+				printf "${ok_color}| %-27s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
 				"$sitename" "$certificate_last_day" "$days_left" "Ok"
 
 			elif [ "$days_left" -le "$warning_days" ] && [ "$days_left" -gt "$alert_days" ];then
-				printf "${warning_color}| %-25s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
+				printf "${warning_color}| %-27s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
 				"$sitename" "$certificate_last_day" "$days_left" "Warning"
 
 			elif [ "$days_left" -le "$alert_days" ] && [ "$days_left" -gt 0 ];then
-				printf "${alert_color}| %-25s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
+				printf "${alert_color}| %-27s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
 				"$sitename" "$certificate_last_day" "$days_left" "Alert"
 
 			elif [ "$days_left" -le 0 ];then
-				printf "${expired_color}| %-25s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
+				printf "${expired_color}| %-27s | %-25s | %-10s | %-8s %s\n${end_of_color}" \
 				"$sitename" "$certificate_last_day" "$days_left" "Expired"
 			fi
 		else
-			printf "${unknown_color}| %-25s | %-50s | %-25s | %-10s | %-5s %s\n${end_of_color}" \
+			printf "${unknown_color}| %-27s | %-50s | %-25s | %-10s | %-5s %s\n${end_of_color}" \
 			"$sitename" "n/a" "n/a" "n/a"
 		fi
-	done < ${sites_list} 
+	done < ${sites_list}
 
 	printf "\n %-10s" "STATUS LEGEND"
 	printf "\n ${ok_color}%-8s${end_of_color} %-30s" "Ok" "- More than ${warning_days} days left until the certificate expires"
@@ -170,27 +173,27 @@ howtouse(){
 		-m [ mail ]                   mail address to send the graphs to
 		-s [ slack_channel ]          slack channel to send the report to
 		-h                            help
-	
+
 	Examples:
 
 		# Launch the script in terminal mode:
-		./jota-cert-checker.sh -f sitelist -o terminal
+		./ssl-cert-checker.sh -f sitelist -o terminal
 
 		# Using HTML mode:
-		./jota-cert-checker.sh -f sitelist -o html
+		./ssl-cert-checker.sh -f sitelist -o html
 
 		# Using HTML mode and sending results via email
-		./jota-cert-checker.sh -f sitelist -o html -m mail@example.com
+		./ssl-cert-checker.sh -f sitelist -o html -m mail@example.com
 
 		# Using HTML mode and sending results via email
-		./jota-cert-checker.sh -f sitelist -o html -s my_slack_channel
+		./ssl-cert-checker.sh -f sitelist -o html -s my_slack_channel
 
 	EOF
 }
 
-# 
+#
 # MAIN
-# 
+#
 
 cd "$script_path"
 

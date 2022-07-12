@@ -1,4 +1,4 @@
-# jota-cert-checker
+# ssl-cert-checker
 
 ## Description
 
@@ -12,7 +12,7 @@ The script can be launched in two modes:
 Optionally, you can also embed the HTML and send it via:
 
 * **email**: you will need to install **mutt** if you use this option
-* **slack**: install **imgkit** via pip and **wkhtmltopdf** using your distribution package manager (in RHEL/CentOS you will need to enable EPEL first) Don't forget to configure you Slack Token the **slack_token** variable of jota-cert-checker.sh script
+* **slack**: install **imgkit** via pip and **wkhtmltopdf** using your distribution package manager (in RHEL/CentOS you will need to enable EPEL first) Don't forget to configure you Slack Token the **slack_token** variable of ssl-cert-checker.sh script
 
 ## Usage
 
@@ -43,7 +43,7 @@ In the following cases I modified the variables **warning_days** and **alert_day
 
 To launch the script in terminal mode:
 ```bash
-./jota-cert-checker.sh -f sitelist -o terminal
+./ssl-cert-checker.sh -f sitelist -o terminal
 ```
 We get the following output in our terminal:
 
@@ -51,7 +51,7 @@ We get the following output in our terminal:
 
 In HTML mode:
 ```bash
-./jota-cert-checker.sh -f sitelist -o html
+./ssl-cert-checker.sh -f sitelist -o html
 ```
 We get the following output:
 
@@ -59,7 +59,7 @@ We get the following output:
 
 In HTML mode and sending the result to an email:
 ```bash
-./jota-cert-checker.sh -f sitelist -o html -m mail@example.com
+./ssl-cert-checker.sh -f sitelist -o html -m mail@example.com
 ```
 Checking our email we will see:
 
@@ -67,5 +67,5 @@ Checking our email we will see:
 
 Also in HTML mode and sending the result to a slack channel:
 ```bash
-./jota-cert-checker.sh -f sitelist -o html -s my_slack_channel
+./ssl-cert-checker.sh -f sitelist -o html -s my_slack_channel
 ```

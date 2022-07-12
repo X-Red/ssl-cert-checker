@@ -14,6 +14,8 @@ Optionally, you can also embed the HTML and send it via:
 * **email**: you will need to install **mutt** if you use this option
 * **slack**: install **imgkit** via pip and **wkhtmltopdf** using your distribution package manager (in RHEL/CentOS you will need to enable EPEL first) Don't forget to configure you Slack Token the **slack_token** variable of ssl-cert-checker.sh script
 
+The expiration and alert days limits have been changed to be compatible with the letsencrypt renewal days schema.
+
 ## Usage
 
 For example, we have the following file called sitelist that contains a list of domains with the HTTPS port, one domain per line:
